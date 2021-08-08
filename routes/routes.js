@@ -1,12 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { getData, createDate } = require('../controllers/controllers')
 
-router.get('/', (req, res) => {
-  console.log('get is triggered');
-})
+// Mount controller
+router.route('/').get(getData).post(createDate);
 
-router.post('/', (req, res) => {
-  console.log('post is triggered');
-})
 
 module.exports = router;
