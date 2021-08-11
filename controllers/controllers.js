@@ -1,9 +1,9 @@
 const mysql = require('mysql');
-const Redis = require('redis');
+// const Redis = require('redis');
 const DATABASE = "test_db_1";
 const TABLE = "test_table";
 
-const redisClient = Redis.createClient();
+// const redisClient = Redis.createClient();
 
 // redisClient.on('connect', () => {
 //   console.log('connect to redis');
@@ -21,11 +21,11 @@ const readData = (id) => {
   const CLI = `SELECT * FROM ${TABLE} WHERE id=${id}`;
   return new Promise((resolve, reject) => {
     // Get data from redis, if has one.
-    redisClient.get(id, async (err, redisData) => {
-      console.log(`data in redis: ${redisData}, type of the data ${typeof redisData}`);
-      if (err) return reject(err);
-      if (redisData != null) return resolve(redisData);
-    })
+    // redisClient.get(id, async (err, redisData) => {
+    //   console.log(`data in redis: ${redisData}, type of the data ${typeof redisData}`);
+    //   if (err) return reject(err);
+    //   if (redisData != null) return resolve(redisData);
+    // })
 
     // Get data from MySQL;
     db.query(CLI, (err, data) => {
@@ -34,9 +34,9 @@ const readData = (id) => {
         const id = data[0].id
         const name = data[0].name
         const age = data[0].age
-        redisClient.setex(id, 60, `name: ${name}, age: ${age}`, async (err, data) => {
-          console.log(`Redis data is updated the : ${data}`)
-        })
+        // redisClient.setex(id, 60, `name: ${name}, age: ${age}`, async (err, data) => {
+        //   console.log(`Redis data is updated the : ${data}`)
+        // })
         const mySQLresult = `name: ${name}, age: ${age}`
         // Simulation fetching from remote database;
         setTimeout(() => {
