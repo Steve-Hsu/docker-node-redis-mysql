@@ -1,13 +1,19 @@
 FROM node:14
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY /app/package*.json .
+COPY package*.json ./
 
 RUN npm install
 
-COPY /app .
-
 EXPOSE 5000
 
+COPY . .
+
+
+# COPY wait-for-it.sh /
+
+# RUN npm run build
+
+# CMD /wait-for-it.sh db:3306 -- npm start
 CMD ["npm", "start"]

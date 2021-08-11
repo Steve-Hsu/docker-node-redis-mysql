@@ -7,6 +7,21 @@
     <title>Document</title>
   </head>
   <body>
-    <form type="">
+    <form action="/api/test_docker" method="POST">
+      Create data :
+      <input type="text" id="name" name="name" placeholder="Name" />
+      <input type="number" id="age" name="age" placeholder="Age" />
+      <button type="submit" name="submit">Submit</button>
+    </form>
+    <form action="/api/test_docker/getbyid" method="POST">
+      Search data by Id :
+      <input
+        type="number"
+        id="index"
+        name="index"
+        placeholder="Search with ID"
+      />
+      <button type="submit" name="submit">Submit</button>
+    </form>
   </body>
 </html>

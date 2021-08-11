@@ -1,5 +1,6 @@
 const express = require('express');
 const routes = require('./routes/routes');
+const bodyParser = require('body-parser')
 // const Redis = require('redis');
 
 
@@ -13,11 +14,14 @@ const PORT = process.env.PORT || 5000;
 // redisClient.on('connect', () => {
 //   console.log('connect to redis, at server.js');
 // })
-
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/test_docker', routes);
-// app.get('/api/test_docker', (req, res) => {
-//   res.sendFile(__dirname + '/index.html')
-// });
+
+// Home pages
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
 
 app.listen(PORT, () => {
   console.log('server is listenning');

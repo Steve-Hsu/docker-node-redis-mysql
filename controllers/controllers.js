@@ -1,19 +1,20 @@
 const mysql = require('mysql');
-// const Redis = require('redis');
+const Redis = require('redis');
 const DATABASE = "test_db_1";
 const TABLE = "test_table";
 
-// const redisClient = Redis.createClient();
+const redisClient = Redis.createClient();
 
-// redisClient.on('connect', () => {
-//   console.log('connect to redis');
-// })
+redisClient.on('connect', () => {
+  console.log('connect to redis');
+})
 
 const db = mysql.createConnection({
   host: "localhost",
   user: "steve",
   password: "12345",
-  database: DATABASE
+  database: DATABASE,
+  port: "3306",
 });
 db.connect();
 
@@ -21,11 +22,11 @@ const readData = (id) => {
   const CLI = `SELECT * FROM ${TABLE} WHERE id=${id}`;
   return new Promise((resolve, reject) => {
     // Get data from redis, if has one.
-    // redisClient.get(id, async (err, redisData) => {
-    //   console.log(`data in redis: ${redisData}, type of the data ${typeof redisData}`);
-    //   if (err) return reject(err);
-    //   if (redisData != null) return resolve(redisData);
-    // })
+    redisClient.get(id, async (err, redisData) => {
+      console.log(`data in redis: ${redisData}, type of the data ${typeof redisData}`);
+      if (err) return reject(err);
+      if (redisData != null) return resolve(redisData);
+    })
 
     // Get data from MySQL;
     db.query(CLI, (err, data) => {
@@ -34,11 +35,11 @@ const readData = (id) => {
         const id = data[0].id
         const name = data[0].name
         const age = data[0].age
-        // redisClient.setex(id, 60, `name: ${name}, age: ${age}`, async (err, data) => {
-        //   console.log(`Redis data is updated the : ${data}`)
-        // })
+        redisClient.setex(id, 60, `name: ${name}, age: ${age}`, async (err, data) => {
+          console.log(`Redis data is updated the : ${data}`)
+        })
         const mySQLresult = `name: ${name}, age: ${age}`
-        // Simulation fetching from remote database;
+        // Simulation fetching from remote database;s
         setTimeout(() => {
           return resolve(mySQLresult);
         }, 3000);
@@ -52,11 +53,11 @@ const readData = (id) => {
 const addData = async (name, age) => {
   const inserData = (resolve) => {
     // redisClient.set(name, age);
-
     const sql = `insert into test_table(name, age) values("${name}", "${age}")`
     db.query(sql, (err, result) => {
+      console.log('the create result', result.insertId)
       if (err) return reject(err);
-      return resolve(JSON.stringify(result));
+      return resolve(result.insertId);
     });
   }
 
@@ -94,8 +95,21 @@ exports.getData = async (req, res, next) => {
 
   try {
     const data = await readData(id);
-    console.log('the result', data)
-    console.log('the result', typeof data);
+    const result = data ? data :
+      `No data matched with id : ${id}`;
+
+    res.status(200).json({ success: true, data: `${result}` });
+  } catch (err) {
+    res.status(400).json({ success: false, Error: `${err}` });
+  }
+}
+
+exports.getDataById = async (req, res, next) => {
+  try {
+    console.log('the body', req.body)
+    console.log('the index', req.body.index)
+    const id = req.body.index || 0
+    const data = await readData(id);
     const result = data ? data :
       `No data matched with id : ${id}`;
 
@@ -108,9 +122,11 @@ exports.getData = async (req, res, next) => {
 //@desc   Create data
 exports.createDate = async (req, res, next) => {
   try {
+    console.log('the router age', req.body.age);
+    console.log('the body', req.body)
     let result = await addData(req.body.name, req.body.age);
     console.log('new data created', result)
-    res.status(200).json({ success: true, data: `you create data : ${result}` });
+    res.status(200).json({ success: true, data: `Data created, Your Id is : ${result}` });
   } catch (err) {
     res.status(400).json({ success: false, Error: `${err}` });
   }
