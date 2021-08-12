@@ -11,8 +11,8 @@ const TABLE = "test_table";
 
 const db = mysql.createConnection({
   host: "localhost",
-  user: "steve",
-  password: "12345",
+  user: "root",
+  password: "rootmysql123",
   database: DATABASE,
   port: "3306",
 });

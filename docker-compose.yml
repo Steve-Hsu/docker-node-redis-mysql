@@ -1,80 +1,30 @@
-# version: "3.8"
-
-# services:
-# mysqldb:
-#   image: mysql
-#   command: --default-authentication-plugin=mysql_native_password
-#   restart: always
-#   # env_file: ./.env
-#   environment:
-#     MYSQL_ROOT_PASSWORD: mysqlroot123
-#     MYSQL_DATABASE: test_db_1
-#   ports:
-#     - "3307:3306"
-#   networks:
-#     - app_net
-#   # volumes:
-#   #   - db-config:/etc/mysql
-#   #   - db-data:/var/lib/mysql
-#   #   - ./db/backup/files/:/data_backup/data
-#   app:
-#     build: .
-#     command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; npm start'
-#     ports:
-#       - "5000:5000"
-#     image: node-mysql-app
-#     depends_on:
-#       - mysqldb
-#     stdin_open: true
-#     tty: true
-#     networks:
-#       - app_net
-#     # command: [".", "mysql:3307"]
-# networks:
-#   app_net:
-#     driver: "bridge"
-# volumes:
-#   db-config:
-#   db-data:
-
 version: "3.8"
-
-networks:
-  app-tier:
-    driver: bridge
-
 services:
-  db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    expose:
-      - "3306"
-    # ports:
-    #   - "127.0.0.1:3306:3306"
-    # ports:
-    #   - "3306:3306"
-    networks:
-      - app-tier
-    environment:
-      MYSQL_DATABASE: test_db_1
-      MYSQL_ALLOW_EMPTY_PASSWORD: ok
-      MYSQL_ROOT_PASSWORD: rootmysql123
-      MYSQL_USER: steve
-      MYSQL_PASSWORD: 12345
-      MYSQL_ROOT_HOST: "%"
-  app:
-    depends_on:
-      - db
-    links:
-      - db:test_db_1
-    build: .
-    # command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; npm start'
+  web:
+    build:
+      context: .
+    env_file: ./.env
+    command: npm start
+    volumes:
+      - .:/app/
+      - /app/node_modules
     ports:
-      - 5000:5000
-    networks:
-      - app-tier
-# valoumes:
-#   - /var/lib/mysql
-#   - ./opt/data:/var/lib/mysql
-#   - datavolume:/var/lib/mysql
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    depends_on:
+      - mysqldb
+    environment:
+      MYSQL_HOST: mysqldb
+  mysqldb:
+    image: mysql
+    env_file: ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+    ports:
+      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
+    volumes:
+      - mysql:/var/lib/mysql
+      - mysql_config:/etc/mysql
+volumes:
+  mysql:
+  mysql_config:
