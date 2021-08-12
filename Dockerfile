@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-EXPOSE 5000
+EXPOSE 3000
 
 COPY . .
 
@@ -16,4 +16,4 @@ COPY . .
 # RUN npm run build
 
 # CMD /wait-for-it.sh db:3306 -- npm start
-CMD ["npm", "start"]
+# CMD ["npm", "start"]

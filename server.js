@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 const app = express();
 // Body parser;
 app.use(express.json());
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 // const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 // const redisClient = Redis.createClient(REDIS_PORT);

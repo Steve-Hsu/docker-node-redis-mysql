@@ -50,8 +50,10 @@ services:
     restart: always
     expose:
       - "3306"
-    ports:
-      - "127.0.0.1:3307:3306"
+    # ports:
+    #   - "127.0.0.1:3306:3306"
+    # ports:
+    #   - "3306:3306"
     networks:
       - app-tier
     environment:
@@ -64,9 +66,15 @@ services:
   app:
     depends_on:
       - db
+    links:
+      - db:test_db_1
     build: .
-    command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; npm start'
+    # command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; npm start'
     ports:
       - 5000:5000
     networks:
       - app-tier
+# valoumes:
+#   - /var/lib/mysql
+#   - ./opt/data:/var/lib/mysql
+#   - datavolume:/var/lib/mysql
