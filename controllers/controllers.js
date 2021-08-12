@@ -10,10 +10,10 @@ const TABLE = "test_table";
 // })
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "rootmysql123",
-  database: DATABASE,
+  host: process.env.MYSQL_HOST || "localhost",
+  user: process.env.MYSQL_USER || "root",
+  password: process.env.MYSQL_ROOT_PASSWORD || "rootmysql123",
+  database: process.env.MYSQL_DATABASE || DATABASE,
   port: "3306",
 });
 db.connect();
