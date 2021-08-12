@@ -3,6 +3,7 @@ services:
   web:
     build:
       context: .
+    command: bash -c 'while !</dev/tcp/mysqldb/3306; do sleep 1; done; npm start'
     env_file: ./.env
     command: npm start
     volumes:
@@ -16,6 +17,8 @@ services:
       MYSQL_HOST: mysqldb
   mysqldb:
     image: mysql
+    # command: --default-authentication-plugin=mysql_native_password
+    command: mysql -u root -p rootmysql123 -e "update user set authentication_string=password(''), plugin='mysql_native_password' where user='root';"
     env_file: ./.env
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
